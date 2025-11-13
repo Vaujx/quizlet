@@ -102,6 +102,7 @@ generateBtn.addEventListener("click", async () => {
       try {
         fileContent = await extractTextFromPDF(fileContent)
       } catch (err) {
+        console.error("[v0] PDF extraction error:", err)
         showError("Error reading PDF file. Please try a TXT or DOCX file.")
         return
       }
@@ -109,6 +110,7 @@ generateBtn.addEventListener("click", async () => {
       try {
         fileContent = await extractTextFromDOCX(fileContent)
       } catch (err) {
+        console.error("[v0] DOCX extraction error:", err)
         showError("Error reading DOCX file. Please try a TXT file.")
         return
       }
@@ -133,8 +135,19 @@ generateBtn.addEventListener("click", async () => {
   }
 })
 
+function arrayBufferToBase64(buffer) {
+  let binary = ""
+  const bytes = new Uint8Array(buffer)
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return btoa(binary)
+}
+
 async function extractTextFromPDF(arrayBuffer) {
-  const base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)))
+  const base64String = arrayBufferToBase64(arrayBuffer)
+
+  console.error("[v0] Sending PDF extraction request, size:", base64String.length)
 
   const response = await fetch(`${API_BASE_URL}/api/extract-pdf`, {
     method: "POST",
@@ -142,13 +155,20 @@ async function extractTextFromPDF(arrayBuffer) {
     body: JSON.stringify({ file: base64String }),
   })
 
-  if (!response.ok) throw new Error("Failed to extract PDF")
+  if (!response.ok) {
+    const errorData = await response.json()
+    console.error("[v0] PDF extraction failed:", errorData)
+    throw new Error(errorData.error || "Failed to extract PDF")
+  }
+
   const data = await response.json()
   return data.text || ""
 }
 
 async function extractTextFromDOCX(arrayBuffer) {
-  const base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)))
+  const base64String = arrayBufferToBase64(arrayBuffer)
+
+  console.error("[v0] Sending DOCX extraction request, size:", base64String.length)
 
   const response = await fetch(`${API_BASE_URL}/api/extract-docx`, {
     method: "POST",
@@ -156,7 +176,12 @@ async function extractTextFromDOCX(arrayBuffer) {
     body: JSON.stringify({ file: base64String }),
   })
 
-  if (!response.ok) throw new Error("Failed to extract DOCX")
+  if (!response.ok) {
+    const errorData = await response.json()
+    console.error("[v0] DOCX extraction failed:", errorData)
+    throw new Error(errorData.error || "Failed to extract DOCX")
+  }
+
   const data = await response.json()
   return data.text || ""
 }
@@ -200,6 +225,7 @@ async function generateQuiz(fileContent) {
     displayQuestion()
   } catch (error) {
     loadingSpinner.classList.add("hidden")
+    console.error("[v0] Quiz generation error:", error)
     showError(error.message || "Failed to generate quiz. Please try again.")
   }
 }
