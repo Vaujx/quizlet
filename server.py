@@ -33,39 +33,83 @@ def serve_static(filename):
 def extract_pdf():
     try:
         data = request.json
-        file_base64 = data['file']
-        file_bytes = base64.b64decode(file_base64)
+        file_base64 = data.get('file')
+        
+        if not file_base64:
+            return jsonify({'error': 'No file data provided'}), 400
+        
+        # Decode base64 to bytes
+        try:
+            file_bytes = base64.b64decode(file_base64)
+        except Exception as e:
+            print(f"[v0] Base64 decode error: {str(e)}")
+            return jsonify({'error': f'Invalid base64 encoding: {str(e)}'}), 400
+        
+        print(f"[v0] PDF file size: {len(file_bytes)} bytes")
         
         # Use PyPDF2 to extract text
         import io
         from PyPDF2 import PdfReader
         
-        pdf_reader = PdfReader(io.BytesIO(file_bytes))
-        text = ""
-        for page in pdf_reader.pages:
-            text += page.extract_text()
-        
-        return jsonify({'text': text})
+        try:
+            pdf_reader = PdfReader(io.BytesIO(file_bytes))
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text()
+            
+            if not text or len(text.strip()) == 0:
+                print("[v0] Warning: PDF extracted but no text found")
+                return jsonify({'error': 'Could not extract text from PDF. The PDF might be empty or contain only images.'}), 400
+            
+            print(f"[v0] Successfully extracted {len(text)} characters from PDF")
+            return jsonify({'text': text})
+        except Exception as e:
+            print(f"[v0] PDF extraction error: {str(e)}")
+            return jsonify({'error': f'Failed to parse PDF: {str(e)}'}), 400
+            
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        print(f"[v0] Unexpected error in extract-pdf: {str(e)}")
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
 
 @app.route('/api/extract-docx', methods=['POST'])
 def extract_docx():
     try:
         data = request.json
-        file_base64 = data['file']
-        file_bytes = base64.b64decode(file_base64)
+        file_base64 = data.get('file')
+        
+        if not file_base64:
+            return jsonify({'error': 'No file data provided'}), 400
+        
+        # Decode base64 to bytes
+        try:
+            file_bytes = base64.b64decode(file_base64)
+        except Exception as e:
+            print(f"[v0] Base64 decode error: {str(e)}")
+            return jsonify({'error': f'Invalid base64 encoding: {str(e)}'}), 400
+        
+        print(f"[v0] DOCX file size: {len(file_bytes)} bytes")
         
         # Use python-docx to extract text
         import io
         from docx import Document
         
-        doc = Document(io.BytesIO(file_bytes))
-        text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
-        
-        return jsonify({'text': text})
+        try:
+            doc = Document(io.BytesIO(file_bytes))
+            text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
+            
+            if not text or len(text.strip()) == 0:
+                print("[v0] Warning: DOCX extracted but no text found")
+                return jsonify({'error': 'Could not extract text from DOCX. The document might be empty.'}), 400
+            
+            print(f"[v0] Successfully extracted {len(text)} characters from DOCX")
+            return jsonify({'text': text})
+        except Exception as e:
+            print(f"[v0] DOCX extraction error: {str(e)}")
+            return jsonify({'error': f'Failed to parse DOCX: {str(e)}'}), 400
+            
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        print(f"[v0] Unexpected error in extract-docx: {str(e)}")
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
 
 @app.route('/api/generate-quiz', methods=['POST'])
 def generate_quiz():
