@@ -33,7 +33,8 @@ def serve_static(filename):
 def extract_pdf():
     try:
         data = request.json
-        file_bytes = bytes(data['file'])
+        file_base64 = data['file']
+        file_bytes = base64.b64decode(file_base64)
         
         # Use PyPDF2 to extract text
         import io
@@ -52,7 +53,8 @@ def extract_pdf():
 def extract_docx():
     try:
         data = request.json
-        file_bytes = bytes(data['file'])
+        file_base64 = data['file']
+        file_bytes = base64.b64decode(file_base64)
         
         # Use python-docx to extract text
         import io
