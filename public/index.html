@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizlet Ai Quiz Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Quizlet Ai Quiz Generator</h1>
+            <p>Upload educational materials and generate intelligent quizzes</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section id="uploadSection" class="section upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <h2>Upload Your Document</h2>
+                    <p>Drag and drop your file here or click to select</p>
+                    <p class="file-types">Supported: PDF, DOCX, DOC, TXT</p>
+                    <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt" hidden>
+                </div>
+
+                <div id="fileInfo" class="file-info hidden">
+                    <p id="fileName"></p>
+                    <button id="changeFileBtn" class="btn btn-secondary">Change File</button>
+                </div>
+
+                <!-- Settings -->
+                <div class="settings">
+                    <div class="setting-group">
+                        <label for="numQuestions">Number of Questions:</label>
+                        <input type="number" id="numQuestions" min="1" max="20" value="5">
+                    </div>
+
+                    <div class="setting-group">
+                        <label for="difficulty">Difficulty Level:</label>
+                        <select id="difficulty">
+                            <option value="mixed">Mixed</option>
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label for="questionType">Question Type:</label>
+                        <select id="questionType">
+                            <option value="mixed">Mixed</option>
+                            <option value="multiple_choice">Multiple Choice</option>
+                            <option value="true_false">True/False</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="generateBtn" class="btn btn-primary" disabled>Generate Quiz</button>
+                <div id="loadingSpinner" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p>Generating quiz with AI...</p>
+                </div>
+                <div id="errorMessage" class="error-message hidden"></div>
+            </section>
+
+            <!-- Quiz Section -->
+            <section id="quizSection" class="section quiz-section hidden">
+                <div class="quiz-header">
+                    <h2 id="quizTitle">Quiz</h2>
+                    <div class="quiz-progress">
+                        <span id="questionCounter">1 of 5</span>
+                    </div>
+                </div>
+
+                <div class="quiz-content">
+                    <div id="questionContainer" class="question-container">
+                        <!-- Questions will be inserted here -->
+                    </div>
+
+                    <div class="quiz-navigation">
+                        <button id="prevBtn" class="btn btn-secondary" disabled>Previous</button>
+                        <button id="nextBtn" class="btn btn-secondary">Next</button>
+                        <button id="submitBtn" class="btn btn-primary" style="display: none;">Submit Quiz</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="section results-section hidden">
+                <div class="results-content">
+                    <h2>Quiz Results</h2>
+                    <div class="score-display">
+                        <div class="score-circle">
+                            <span id="scorePercentage">0%</span>
+                        </div>
+                        <p id="scoreText">You scored 0 out of 0</p>
+                    </div>
+
+                    <div id="resultsDetails" class="results-details">
+                        <!-- Results will be inserted here -->
+                    </div>
+
+                    <button id="retakeBtn" class="btn btn-primary">Generate Another Quiz</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Quizlet Ai Quiz Generator - Powered by Google Gemini API</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
