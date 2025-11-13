@@ -134,10 +134,12 @@ generateBtn.addEventListener("click", async () => {
 })
 
 async function extractTextFromPDF(arrayBuffer) {
+  const base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)))
+
   const response = await fetch(`${API_BASE_URL}/api/extract-pdf`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ file: Array.from(new Uint8Array(arrayBuffer)) }),
+    body: JSON.stringify({ file: base64String }),
   })
 
   if (!response.ok) throw new Error("Failed to extract PDF")
@@ -146,10 +148,12 @@ async function extractTextFromPDF(arrayBuffer) {
 }
 
 async function extractTextFromDOCX(arrayBuffer) {
+  const base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)))
+
   const response = await fetch(`${API_BASE_URL}/api/extract-docx`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ file: Array.from(new Uint8Array(arrayBuffer)) }),
+    body: JSON.stringify({ file: base64String }),
   })
 
   if (!response.ok) throw new Error("Failed to extract DOCX")
